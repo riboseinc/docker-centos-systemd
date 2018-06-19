@@ -120,42 +120,38 @@ rm-$(3):
 rmf-$(3):
 	-docker rm -f test-$(3)
 
-squash-$(3):	docker-squash-exists $(3)/Dockerfile
+dosquash-$(3):
 	FROM_IMAGE=`head -1 $(3)/Dockerfile | cut -f 2 -d ' '`; \
 	$(DOCKER_SQUASH_CMD) -t $(CONTAINER_REMOTE_NAME) \
 		-f $$$${FROM_IMAGE} \
-		$(CONTAINER_LOCAL_NAME) \
-		&& $(MAKE) clean-local-$(3)
+		$(CONTAINER_LOCAL_NAME)
 
-tag-$(3):
+squash-$(3): | docker-squash-exists $(3)/Dockerfile dosquash-$(3) clean-local-$(3)
+
+dotag-$(3):
 	CONTAINER_ID=`docker images -q $(CONTAINER_LOCAL_NAME)`; \
 	if [ "$$$${CONTAINER_ID}" == "" ]; then \
 		echo "Container non-existant, check 'docker images'."; \
 		exit 1; \
 	fi; \
-	docker tag $$$${CONTAINER_ID} $(CONTAINER_REMOTE_NAME) \
-		&& $(MAKE) clean-local-$(3)
+	docker tag $$$${CONTAINER_ID} $(CONTAINER_REMOTE_NAME)
 
-push-$(3):	login
+tag-$(3): | dotag-$(3) clean-local-$(3)
+
+push-$(3): login
 	docker push $(CONTAINER_REMOTE_NAME)
 
-sp-$(3):
-	$(MAKE) squash-$(3) push-$(3)
+sp-$(3): squash-$(3) push-$(3)
 
-bsp-$(3):
-	$(MAKE) build-$(3) sp-$(3)
+bsp-$(3): build-$(3) sp-$(3)
 
-tp-$(3):
-	$(MAKE) tag-$(3) push-$(3)
+tp-$(3): tag-$(3) push-$(3)
 
-btp-$(3):
-	$(MAKE) build-$(3) tp-$(3)
+btp-$(3): build-$(3) tp-$(3)
 
-bt-$(3):
-	$(MAKE) build-$(3) tag-$(3)
+bt-$(3): build-$(3) tag-$(3)
 
-bs-$(3):
-	$(MAKE) build-$(3) squash-$(3)
+bs-$(3): build-$(3) squash-$(3)
 
 endef
 
