@@ -111,8 +111,8 @@ For example, if you use AWS' ECR, you can set this:
 [source,sh]
 ----
 export NS_REMOTE=${account-id}.dkr.ecr.${region}.amazonaws.com/${account-name}
-export DOCKER_LOGIN_CMD='aws ecr get-login --no-include-email \
-  --region=${region} --registry-ids=${ecr-registry-id}'
+export DOCKER_LOGIN_CMD='\$(shell aws ecr get-login --no-include-email \
+  --region=${region} --registry-ids=${ecr-registry-id})'
 ----
 
 If you want to build other containers you can add these:
