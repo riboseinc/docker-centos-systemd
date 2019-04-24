@@ -40,7 +40,7 @@ GET_ROOT_IMAGE = $(word $1,$(ROOT_IMAGES))
 
 DOCKER_LOGIN_USERNAME ?=
 DOCKER_LOGIN_PASSWORD ?=
-DOCKER_LOGIN_CMD ?= "docker login --username=$(DOCKER_LOGIN_USERNAME) --password=\"$(DOCKER_LOGIN_PASSWORD)\""
+DOCKER_LOGIN_CMD ?= "echo \"$(DOCKER_LOGIN_PASSWORD)\" | docker login docker.io --username=$(DOCKER_LOGIN_USERNAME) --password-stdin"
 
 login:
 	eval $(DOCKER_LOGIN_CMD)
@@ -156,3 +156,6 @@ bs-$(3): build-$(3) squash-$(3)
 endef
 
 $(foreach i,$(ITEMS),$(eval $(call ROOT_IMAGE_TASKS,$(call GET_VERSION,$i),$(call GET_ROOT_IMAGE,$i),$(call GET_IMAGE_TYPE,$i),$(CONTAINER_TYPE))))
+
+build: $(addprefix build-, $(notdir $(IMAGE_TYPES)))
+tp: $(addprefix tp-, $(notdir $(IMAGE_TYPES)))
