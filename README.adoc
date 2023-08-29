@@ -110,9 +110,8 @@ For example, if you use AWS' ECR, you can set this:
 
 [source,sh]
 ----
-export NS_REMOTE=${account-id}.dkr.ecr.${region}.amazonaws.com/${account-name}
-export DOCKER_LOGIN_CMD='\$(shell aws ecr get-login --no-include-email \
-  --region=${region} --registry-ids=${ecr-registry-id})'
+export NS_REMOTE="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ACCOUNT_NAME}"
+export DOCKER_LOGIN_CMD="aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 ----
 
 If you want to build other containers you can add these:
@@ -121,8 +120,8 @@ If you want to build other containers you can add these:
 ----
 export ITEMS="1 2 3"
 export IMAGE_TYPES="centos-base centos-systemd centos-special"
-export VERSIONS="7.5 7.5 7.5"
-export ROOT_IMAGES="centos:7.5.1804 \$(NS_REMOTE)/centos-base:7.5.\$(CONTAINER_BRANCH) \$(NS_REMOTE)/centos-special:7.5.\$(CONTAINER_BRANCH)"
+export VERSIONS="7.9 7.9 7.9"
+export ROOT_IMAGES="centos:7 \$(NS_REMOTE)/centos-base:7.9.\$(CONTAINER_BRANCH) \$(NS_REMOTE)/centos-special:7.9.\$(CONTAINER_BRANCH)"
 ----
 
 The environment variables are used for:

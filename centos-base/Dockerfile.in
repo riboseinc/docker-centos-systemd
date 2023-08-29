@@ -1,4 +1,4 @@
 FROM ${ROOT_IMAGE}
 
-MAINTAINER Operations at Ribose <operations@ribose.com>
+LABEL maintainer="operations@ribose.com"
 
