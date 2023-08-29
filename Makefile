@@ -29,9 +29,9 @@ REPO_GIT_NAME ?= $(shell git config --get remote.origin.url)
 
 ITEMS       ?= 1 2
 IMAGE_TYPES ?= centos-base centos-systemd
-VERSIONS		?= 7.5 7.5
-ROOT_IMAGES ?= centos:7.5.1804 \
-  $(NS_REMOTE)/centos-base:7.5.$(CONTAINER_BRANCH)
+VERSIONS		?= 7.9 7.9
+ROOT_IMAGES ?= centos:7 \
+  $(NS_REMOTE)/centos-base:7.9.$(CONTAINER_BRANCH)
 
 # Getters
 GET_IMAGE_TYPE = $(word $1,$(IMAGE_TYPES))
