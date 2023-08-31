@@ -85,7 +85,9 @@ $(3)/Dockerfile:
 		sed '1d' $$@.in >> $$@
 
 build-$(3):	$(3)/Dockerfile
-	docker build --rm \
+	docker buildx build --rm \
+		--platform linux/amd64,linux/arm64 \
+		--output type=docker \
 		-t $(CONTAINER_LOCAL_NAME) \
 		-f $(3)/Dockerfile \
 		--label ribose-base-container-root=$(2) \
@@ -129,12 +131,13 @@ dosquash-$(3):
 squash-$(3): | docker-squash-exists $(3)/Dockerfile dosquash-$(3) clean-local-$(3)
 
 dotag-$(3):
-	CONTAINER_ID=`docker images -q $(CONTAINER_LOCAL_NAME)`; \
-	if [ "$$$${CONTAINER_ID}" == "" ]; then \
+	IMAGE_ID=`docker images -q $(CONTAINER_LOCAL_NAME)`; \
+	if [ "$$$${IMAGE_ID}" == "" ]; then \
 		echo "Container non-existant, check 'docker images'."; \
 		exit 1; \
 	fi; \
-	docker tag $$$${CONTAINER_ID} $(CONTAINER_REMOTE_NAME)
+	IMAGE_ID=`echo $$$${IMAGE_ID} | cut -d " " -f1`; \
+	docker tag $$$${IMAGE_ID} $(CONTAINER_REMOTE_NAME)
 
 tag-$(3): | dotag-$(3) clean-local-$(3)
 
