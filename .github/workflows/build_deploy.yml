@@ -41,17 +41,4 @@ jobs:
           NS_REMOTE: "${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ACCOUNT_NAME }}"
           DOCKER_LOGIN_CMD: "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com"
         run: |
-          make build
-
-      - name: Deploy
-        if: ${{ success() }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
-          ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          NS_REMOTE: "${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ACCOUNT_NAME }}"
-          DOCKER_LOGIN_CMD: "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com"
-        run: |
-          make tp
+          make build-push

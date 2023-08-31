@@ -66,7 +66,7 @@ define ROOT_IMAGE_TASKS
 # Comment this out when debugging
 .INTERMEDIATE: $(3)/Dockerfile
 
-.PHONY: build-$(3) clean-local-$(3) kill-$(3) rm-$(3) \
+.PHONY: build-$(3) build-push-$(3) clean-local-$(3) kill-$(3) rm-$(3) \
 	rmf-$(3) squash-$(3) tag-$(3) push-$(3) sp-$(3) \
 	bsp-$(3) tp-$(3) btp-$(3) bt-$(3) bs-$(3) \
 	clean-remote-$(3) run-$(3)
@@ -84,6 +84,7 @@ $(3)/Dockerfile:
 		echo "$$$${FROM_LINE_EVALED}" > $$@; \
 		sed '1d' $$@.in >> $$@
 
+# Use this option when local docker supports multi plaform
 build-$(3):	$(3)/Dockerfile
 	docker buildx build --rm \
 		--platform linux/amd64,linux/arm64 \
@@ -93,6 +94,21 @@ build-$(3):	$(3)/Dockerfile
 		--label ribose-base-container-root=$(2) \
 		--label ribose-base-container-source=$(REPO_GIT_NAME)/$(3) \
 		--label ribose-base-container=$(CONTAINER_LOCAL_NAME) \
+		--label ribose-base-container-remote=$(CONTAINER_REMOTE_NAME) \
+		--label ribose-base-container-version=$(1) \
+		--label ribose-base-container-commit=$(CONTAINER_COMMIT) \
+		--label ribose-base-container-commit-branch=$(CONTAINER_BRANCH) \
+		.
+
+build-push-$(3):	$(3)/Dockerfile
+	docker buildx build --rm \
+		--platform linux/amd64,linux/arm64 \
+		--output type=image,name=$(CONTAINER_REMOTE_NAME),push=true \
+		-t $(CONTAINER_REMOTE_NAME) \
+		-f $(3)/Dockerfile \
+		--label ribose-base-container-root=$(2) \
+		--label ribose-base-container-source=$(REPO_GIT_NAME)/$(3) \
+		--label ribose-base-container=$(CONTAINER_REMOTE_NAME) \
 		--label ribose-base-container-remote=$(CONTAINER_REMOTE_NAME) \
 		--label ribose-base-container-version=$(1) \
 		--label ribose-base-container-commit=$(CONTAINER_COMMIT) \
@@ -161,4 +177,5 @@ endef
 $(foreach i,$(ITEMS),$(eval $(call ROOT_IMAGE_TASKS,$(call GET_VERSION,$i),$(call GET_ROOT_IMAGE,$i),$(call GET_IMAGE_TYPE,$i),$(CONTAINER_TYPE))))
 
 build: $(addprefix build-, $(notdir $(IMAGE_TYPES)))
+build-push: $(addprefix build-push-, $(notdir $(IMAGE_TYPES)))
 tp: $(addprefix tp-, $(notdir $(IMAGE_TYPES)))
